@@ -2,9 +2,6 @@
 #include <ESP8266WiFi.h>
 #include "WiFiCredentials.h"
 
-//const char* ssid = "home";
-//const char* password = "password";
-
 void setupWifi() {
 
   Serial.println();

@@ -1,3 +1,6 @@
+
+enum ledColorEnum { red, green, blue, purple, plum };
+
 void setup() {
     // Serial port for debugging purposes
     Serial.begin(115200);
@@ -14,8 +17,7 @@ void loop() {
 void ledTestResponse(bool turnOff) {
     if (turnOff) {
         ledTurnOffAll();
-    }
-    else {
+    } else {
         ledTurnOnAll();
     }
 }
