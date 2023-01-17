@@ -20,27 +20,37 @@ void setupLed()
 
 void loopLed()
 {
-    if (_override) {
-        return;
+    // Debug delay.
+    delay(100);
+
+    if (!_override) {
+        ledLoopAmbientLight();
     }
 
-    ledLoopAmbientLight();
+    FastLED.show();
 }
 
 void ledTurnOffAll() {
     _override = true;
 
     for (int i = 0; i < NUM_LEDS; i++) {
-        leds[i] = CRGB::Black;
+        leds[i] = CHSV(100, 100, 0);
     }
 
-    FastLED.show();
+    Serial.println("led - lights off");
+}
+
+void ledTurnOnAll() {
+    _override = false;
+
+    for (int i = 0; i < NUM_LEDS; i++) {
+        leds[i] = CHSV(100, 100, 100);
+    }
+
+    Serial.println("led - lights on");
 }
 
 void ledLoopAmbientLight() {
-    // Debug delay.
-    delay(100);
-
     unsigned long currentMillis = millis();
     float offset = 250;
     float totalOffset = offset * NUM_LEDS;
@@ -65,6 +75,4 @@ void ledLoopAmbientLight() {
     for (int i = 0; i < NUM_LEDS; i++) {
         leds[i] = CHSV (hue + (i * 5), 255, brightness + 100);
     }
-
-    FastLED.show();
 }
