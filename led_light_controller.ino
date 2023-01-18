@@ -1,6 +1,6 @@
 
 enum ledColorEnum {
-  red, green, blue, purple, plum
+  off = 0, red = 1, green = 2, blue = 3, purple = 4, plum = 5
 };
 
 void setup() {

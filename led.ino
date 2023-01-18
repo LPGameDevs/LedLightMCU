@@ -48,10 +48,8 @@ void ledTurnOnAll() {
   Serial.println("led - lights on");
 }
 
-void ledSetColour(ledColorEnum colourString) {
-  _override = true;
-
-  CRGB colour;
+struct CRGB getColour(ledColorEnum colourString) {
+  CRGB colour = CRGB(0, 0, 0);
 
   switch (colourString) {
     case red  :
@@ -74,14 +72,30 @@ void ledSetColour(ledColorEnum colourString) {
       Serial.println("case plum");
       colour = CRGB::Plum;
       break;
-    default:
-      Serial.println("case default");
-      colour = CRGB(0, 0, 0);
   }
 
+  return colour;
+}
+
+void ledSetColour(ledColorEnum colourString) {
+  _override = true;
+
+  CRGB colour = getColour(colourString);
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = colour;
   }
+}
+
+void ledSetLightColour(int light, ledColorEnum colourString) {
+  // Check light exists.
+  if (light >= NUM_LEDS) {
+    return;
+  }
+
+  _override = true;
+
+  CRGB colour = getColour(colourString);
+  leds[light] = colour;
 }
 
 void ledLoopAmbientLight() {

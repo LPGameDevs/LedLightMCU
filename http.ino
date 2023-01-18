@@ -1,4 +1,7 @@
 #include "ESPAsyncWebServer.h"
+#include <ArduinoJson.h>
+
+StaticJsonDocument<200> doc;
 
 AsyncWebServer server(80);
 
@@ -17,9 +20,37 @@ void setupHttp() {
   });
 
   serverSetColours();
+  serverSetLights();
 
   // Start server
   server.begin();
+}
+
+void serverSetLights() {
+  server.on("/set/light", HTTP_POST, [](AsyncWebServerRequest *request) {
+    request->send_P(200, "text/plain", "hello world");
+
+    if (request->hasArg("body")) {
+      String json = request->arg("body");
+      DeserializationError error = deserializeJson(doc, json);
+
+      if (error) {
+        Serial.print(F("deserializeJson() failed: "));
+        Serial.println(error.f_str());
+        return;
+      }
+
+      int light = doc["light"];
+      int colour = doc["colour"];
+      ledColorEnum colourEnum = static_cast<ledColorEnum>(colour);
+
+      Serial.println(light);
+      Serial.println(colour);
+      Serial.println(colourEnum);
+
+      ledSetLightColour(light, colourEnum);
+    }
+  });
 }
 
 void serverSetColours() {
