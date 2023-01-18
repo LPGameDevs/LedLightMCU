@@ -11,16 +11,13 @@ CRGB leds[NUM_LEDS];
 const int ledPin = 4; //marked as D2 on the board
 
 bool inverse = false;
-bool _override = true;
+bool _override = false;
 
 void setupLed() {
   FastLED.addLeds<WS2812B, ledPin, GRB>(leds, NUM_LEDS);
 }
 
 void loopLed() {
-  // Debug delay.
-  delay(100);
-
   if (!_override) {
     ledLoopAmbientLight();
   }
@@ -52,7 +49,11 @@ struct CRGB getColour(ledColorEnum colourString) {
   CRGB colour = CRGB(0, 0, 0);
 
   switch (colourString) {
-    case red  :
+    case off:
+      Serial.println("case off");
+      colour = CRGB(0, 0, 0);
+      break;
+    case red:
       Serial.println("case red");
       colour = CRGB::Red;
       break;

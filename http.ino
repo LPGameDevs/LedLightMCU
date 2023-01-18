@@ -26,64 +26,48 @@ void setupHttp() {
   server.begin();
 }
 
+bool httpProcessJsonData(String json) {
+
+  DeserializationError error = deserializeJson(doc, json);
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return false;
+  }
+
+  return true;
+}
+
 void serverSetLights() {
   server.on("/set/light", HTTP_POST, [](AsyncWebServerRequest *request) {
     request->send_P(200, "text/plain", "hello world");
 
     if (request->hasArg("body")) {
       String json = request->arg("body");
-      DeserializationError error = deserializeJson(doc, json);
 
-      if (error) {
-        Serial.print(F("deserializeJson() failed: "));
-        Serial.println(error.f_str());
-        return;
+      bool success = httpProcessJsonData(json);
+      if (success) {
+        int light = doc["light"];
+        int colour = doc["colour"];
+        ledColorEnum colourEnum = static_cast<ledColorEnum>(colour);
+        ledSetLightColour(light, colourEnum);
       }
-
-      int light = doc["light"];
-      int colour = doc["colour"];
-      ledColorEnum colourEnum = static_cast<ledColorEnum>(colour);
-
-      Serial.println(light);
-      Serial.println(colour);
-      Serial.println(colourEnum);
-
-      ledSetLightColour(light, colourEnum);
     }
   });
 }
 
 void serverSetColours() {
-
-  server.on("/set/red", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.println("http request - lights to red");
+  server.on("/set/lights", HTTP_POST, [](AsyncWebServerRequest *request) {
     request->send_P(200, "text/plain", "hello world");
-    ledSetColour(ledColorEnum::red);
-  });
+    if (request->hasArg("body")) {
+      String json = request->arg("body");
 
-  server.on("/set/blue", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.println("http request - lights to blue");
-    request->send_P(200, "text/plain", "hello world");
-    ledSetColour(ledColorEnum::blue);
-  });
-
-  server.on("/set/green", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.println("http request - lights to green");
-    request->send_P(200, "text/plain", "hello world");
-    ledSetColour(ledColorEnum::green);
-  });
-
-
-  server.on("/set/purple", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.println("http request - lights to purple");
-    request->send_P(200, "text/plain", "hello world");
-    ledSetColour(ledColorEnum::purple);
-  });
-
-
-  server.on("/set/plum", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.println("http request - lights to plum");
-    request->send_P(200, "text/plain", "hello world");
-    ledSetColour(ledColorEnum::plum);
+      bool success = httpProcessJsonData(json);
+      if (success) {
+        int colour = doc["colour"];
+        ledColorEnum colourEnum = static_cast<ledColorEnum>(colour);
+        ledSetColour(colourEnum);
+      }
+    }
   });
 }
