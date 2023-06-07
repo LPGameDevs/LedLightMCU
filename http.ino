@@ -19,8 +19,11 @@ void setupHttp() {
     ledTestResponse(false);
   });
 
+  serverSetBrightness();
   serverSetColours();
   serverSetLights();
+
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*"); 
 
   // Start server
   server.begin();
@@ -36,6 +39,36 @@ bool httpProcessJsonData(String json) {
   }
 
   return true;
+}
+
+void serverSetBrightness() {
+  server.on("/brightness", HTTP_GET, [](AsyncWebServerRequest *request){
+ 
+    int paramsNr = request->params();
+    Serial.println(paramsNr);
+
+
+    if (request->hasParam("q")) {
+      String valueStr = request->getParam("q")->value();
+      int brightness = valueStr.toInt();
+      ledSetBrightness(brightness);
+    }
+
+ 
+    for(int i=0;i<paramsNr;i++){
+ 
+        AsyncWebParameter* p = request->getParam(i);
+        Serial.print("Param name: ");
+        Serial.println(p->name());
+        Serial.print("Param value: ");
+        Serial.println(p->value());
+        Serial.println("------");
+    }
+ 
+    request->send(200, "text/plain", "message received");
+  });
+
+ 
 }
 
 void serverSetLights() {

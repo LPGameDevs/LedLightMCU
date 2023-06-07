@@ -13,6 +13,12 @@ const int ledPin = 4; //marked as D2 on the board
 bool inverse = false;
 bool _override = false;
 
+// between 1 and 100
+int _brightness = 50;
+
+// Between 1 and 5.
+int _speed = 3;
+
 void setupLed() {
   FastLED.addLeds<WS2812B, ledPin, GRB>(leds, NUM_LEDS);
 }
@@ -78,6 +84,11 @@ struct CRGB getColour(ledColorEnum colourString) {
   return colour;
 }
 
+
+void ledSetBrightness(int value) {
+  _brightness = value;
+}
+
 void ledSetColour(ledColorEnum colourString) {
   _override = true;
 
@@ -102,7 +113,7 @@ void ledSetLightColour(int light, ledColorEnum colourString) {
 void ledLoopAmbientLight() {
   unsigned long currentMillis = millis();
   float offset = 250;
-  float totalOffset = offset * NUM_LEDS;
+  float totalOffset = _speed * offset * NUM_LEDS;
 
   int intervals = std::floor(currentMillis / totalOffset);
   inverse = (intervals % 2 == 0);
@@ -118,10 +129,10 @@ void ledLoopAmbientLight() {
   }
 
   float hue = progress * 255;
-  float brightness = progress * 100;
+  float brightness = _brightness;
   float three = progress * 255;
 
   for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = CHSV(hue + (i * 5), 255, brightness + 100);
+    leds[i] = CHSV(hue + (i * 5), 200, brightness / 100 * 255);
   }
 }
