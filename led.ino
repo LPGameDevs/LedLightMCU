@@ -89,6 +89,11 @@ void ledSetBrightness(int value) {
   _brightness = value;
 }
 
+void ledSetSpeed(int value) {
+  _speed = value;
+}
+
+
 void ledSetColour(ledColorEnum colourString) {
   _override = true;
 
@@ -112,8 +117,8 @@ void ledSetLightColour(int light, ledColorEnum colourString) {
 
 void ledLoopAmbientLight() {
   unsigned long currentMillis = millis();
-  float offset = 250;
-  float totalOffset = _speed * offset * NUM_LEDS;
+  float offset = 250 * _speed;
+  float totalOffset = offset * NUM_LEDS;
 
   int intervals = std::floor(currentMillis / totalOffset);
   inverse = (intervals % 2 == 0);

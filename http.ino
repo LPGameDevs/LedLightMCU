@@ -20,6 +20,7 @@ void setupHttp() {
   });
 
   serverSetBrightness();
+  serverSetSpeed();
   serverSetColours();
   serverSetLights();
 
@@ -65,6 +66,19 @@ void serverSetBrightness() {
         Serial.println("------");
     }
  
+    request->send(200, "text/plain", "message received");
+  });
+
+ 
+}
+
+void serverSetSpeed() {
+  server.on("/speed", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->hasParam("q")) {
+      String valueStr = request->getParam("q")->value();
+      int speed = valueStr.toInt();
+      ledSetSpeed(speed);
+    }
     request->send(200, "text/plain", "message received");
   });
 
