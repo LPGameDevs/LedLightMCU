@@ -1,15 +1,29 @@
-#include "ESPAsyncWebServer.h"
+#include <ESP8266WebServer.h>
+#include <ESP8266WebServerSecure.h>
 #include <ArduinoJson.h>
 
 StaticJsonDocument<200> doc;
 
-AsyncWebServer server(80);
+static const char serverCert[] PROGMEM = R"EOF(
+paste here content of "cert.txt"
+)EOF";
+
+static const char serverKey[] PROGMEM =  R"EOF(
+paste here content of "key.txt"
+)EOF";
+
+
+BearSSL::ESP8266WebServerSecure server(443);
+ESP8266WebServer serverHTTP(80);
 
 void setupHttp() {
 
-  server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request) {
+  // Configure the SSL context
+  server.getServer().setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
+
+  server.on("/off", HTTP_GET, []() {
     Serial.println("http request - lights off");
-    request->send_P(200, "text/plain", "hello world");
+    server->send(200, "text/plain", "hello world");
     ledTestResponse(true);
   });
 
@@ -72,8 +86,8 @@ void serverSetBrightness() {
 }
 
 void serverSetLights() {
-  server.on("/set/light", HTTP_POST, [](AsyncWebServerRequest *request) {
-    request->send_P(200, "text/plain", "hello world");
+  server.on("/set/light", HTTP_POST, []() {
+    server->send(200, "text/plain", "hello world");
 
     if (request->hasArg("body")) {
       String json = request->arg("body");
